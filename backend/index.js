@@ -29,14 +29,32 @@ app.use(cors({
 // Serve static files from uploads directory
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')))
 
-
-app.get('/', (req, res) => {
-    res.send("API IS WORKING......")
-})
-
+// API Routes
 app.use('/user', userRoute)
 app.use('/blog', blogRouter)
 app.use('/admin', adminRouter)
+
+// Serve frontend build files in production
+if (process.env.NODE_ENV === 'production') {
+    app.use(express.static(path.join(__dirname, '../frontend/dist')))
+    
+    // Handle React Router - serve index.html for all non-API routes
+    app.get('*', (req, res, next) => {
+        // Skip API routes and uploads
+        if (req.path.startsWith('/user') || 
+            req.path.startsWith('/blog') || 
+            req.path.startsWith('/admin') || 
+            req.path.startsWith('/uploads')) {
+            return next()
+        }
+        res.sendFile(path.join(__dirname, '../frontend/dist/index.html'))
+    })
+} else {
+    // Development mode - just show API status
+    app.get('/', (req, res) => {
+        res.send("API IS WORKING......")
+    })
+}
 
 
 app.listen(PORT, () => console.log("SERVER started at PORT :", PORT))
