@@ -39,7 +39,7 @@ if (process.env.NODE_ENV === 'production') {
     app.use(express.static(path.join(__dirname, '../frontend/dist')))
     
     // Handle React Router - serve index.html for all non-API routes
-    app.get('*', (req, res, next) => {
+    app.get('/*', (req, res, next) => {
         // Skip API routes and uploads
         if (req.path.startsWith('/user') || 
             req.path.startsWith('/blog') || 
