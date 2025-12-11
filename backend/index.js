@@ -37,19 +37,21 @@ app.use('/admin', adminRouter)
 // Serve frontend build files in production
 if (process.env.NODE_ENV === 'production') {
     app.use(express.static(path.join(__dirname, '../frontend/dist')))
-    
-    // Handle React Router - serve index.html for all non-API routes
-    app.get('/*', (req, res, next) => {
-        // Skip API routes and uploads
-        if (req.path.startsWith('/user') || 
-            req.path.startsWith('/blog') || 
-            req.path.startsWith('/admin') || 
-            req.path.startsWith('/uploads')) {
+
+    app.use((req, res, next) => {
+        if (
+            req.path.startsWith('/user') ||
+            req.path.startsWith('/blog') ||
+            req.path.startsWith('/admin') ||
+            req.path.startsWith('/uploads')
+        ) {
             return next()
         }
-        res.sendFile(path.join(__dirname, '../frontend/dist/index.html'))
+
+        return res.sendFile(path.join(__dirname, '../frontend/dist/index.html'))
     })
-} else {
+}
+ else {
     // Development mode - just show API status
     app.get('/', (req, res) => {
         res.send("API IS WORKING......")
